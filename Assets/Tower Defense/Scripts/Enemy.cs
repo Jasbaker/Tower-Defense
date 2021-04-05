@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Transactions;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -7,14 +8,20 @@ public class Enemy : MonoBehaviour
   public Path route;
   private Waypoint[] myPathThroughLife;
   public int coinWorth;
-  public float health;
+  public float health = 100;
   public float speed = .25f;
   private int index = 0;
   private Vector3 nextWaypoint;
   private bool stop = false;
+  private float healthPerUnit;
+  public Purse purse;
 
-  void Awake()
+    public Transform healthBar;
+
+  void Start()
   {
+    healthPerUnit = 100f / health;
+
     myPathThroughLife = route.path;
     transform.position = myPathThroughLife[index].transform.position;
     Recalculate();
@@ -34,7 +41,6 @@ public class Enemy : MonoBehaviour
       Vector3 moveThisFrame = nextWaypoint * Time.deltaTime * speed;
       transform.Translate(moveThisFrame);
     }
-    
 
   }
 
@@ -50,4 +56,22 @@ public class Enemy : MonoBehaviour
       stop = true;
     }
   }
+
+  public void Damage()
+  {
+    health -= 20;
+    if (health <= 0)
+    {
+      
+      
+      Debug.Log($"{transform.name} is Dead");
+      Destroy(this.gameObject);
+      purse.coins += coinWorth;
+    }
+
+    float percentage = healthPerUnit * health;
+    Vector3 newHealthAmount = new Vector3(percentage/100f , healthBar.localScale.y, healthBar.localScale.z);
+    healthBar.localScale = newHealthAmount;
+  }
+
 }
