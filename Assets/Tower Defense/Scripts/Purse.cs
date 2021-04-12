@@ -10,7 +10,7 @@ public class Purse : MonoBehaviour
 
     void Awake()
     {
-        coins = 0;
+        coins = 20;
     }
 
     // Update is called once per frame

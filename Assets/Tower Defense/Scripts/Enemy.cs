@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Transactions;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Enemy : MonoBehaviour
 {
   public Path route;
   private Waypoint[] myPathThroughLife;
   public int coinWorth;
+  public int lifeHit;
   public float health = 100;
   public float speed = .25f;
   private int index = 0;
@@ -15,10 +17,13 @@ public class Enemy : MonoBehaviour
   private bool stop = false;
   private float healthPerUnit;
   public Purse purse;
+    public Lives lives;
+    public GameObject ExplosionParitcles;
 
     public Transform healthBar;
+    public UnityEvent DeathEvent;
 
-  void Start()
+    void Start()
   {
     healthPerUnit = 100f / health;
 
@@ -54,24 +59,36 @@ public class Enemy : MonoBehaviour
     else
     {
       stop = true;
+      lives.lives -= lifeHit;
     }
   }
 
-  public void Damage()
-  {
-    health -= 20;
-    if (health <= 0)
+    public void Damage()
     {
-      
-      
-      Debug.Log($"{transform.name} is Dead");
-      Destroy(this.gameObject);
-      purse.coins += coinWorth;
+        Damage(20);
     }
 
-    float percentage = healthPerUnit * health;
-    Vector3 newHealthAmount = new Vector3(percentage/100f , healthBar.localScale.y, healthBar.localScale.z);
-    healthBar.localScale = newHealthAmount;
-  }
+
+    public void Damage(float hitAmount)
+    {
+        health -= hitAmount;
+        if (health <= 0)
+        {
+
+
+            Debug.Log($"{transform.name} is Dead");
+            DeathEvent.Invoke();
+            DeathEvent.RemoveAllListeners();
+            purse.coins += coinWorth;
+
+            Destroy(this.gameObject);
+            GameObject blast = Instantiate(ExplosionParitcles, gameObject.transform.position, Quaternion.identity);
+            blast.GetComponent<ParticleSystem>().Play();
+        }
+
+        float percentage = healthPerUnit * health;
+        Vector3 newHealthAmount = new Vector3(percentage / 100f, healthBar.localScale.y, healthBar.localScale.z);
+        healthBar.localScale = newHealthAmount;
+    }
 
 }

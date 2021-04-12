@@ -10,6 +10,7 @@ public class HordeManager : MonoBehaviour
   public Wave enemyWave;
   public Path enemyPath;
   public Purse enemyCoins;
+  public Lives enemyLives;
 
 
   IEnumerator Start()
@@ -35,6 +36,7 @@ public class HordeManager : MonoBehaviour
         Enemy spawnedEnemy = Instantiate(enemyWave.groupsOfEnemiesInWave[i].smallEnemy).GetComponent<Enemy>();
         spawnedEnemy.route = enemyPath;
         spawnedEnemy.purse = enemyCoins;
+        spawnedEnemy.lives = enemyLives;
         yield return new WaitForSeconds(enemyWave.groupsOfEnemiesInWave[i].coolDownBetweenSmallEnemies);
 
       }
@@ -42,14 +44,27 @@ public class HordeManager : MonoBehaviour
       yield return new WaitForSeconds(enemyWave.coolDownBetweenSmallWave); // cooldown between groups
     }
 
-    Debug.Log("done with small");
 
   }
 
   IEnumerator SpawnBigEnemies()
   {
-    yield return null;
-  }
+        for (int i = 0; i < enemyWave.groupsOfEnemiesInWave.Length; i++)
+        {
+
+            for (int j = 0; j < enemyWave.groupsOfEnemiesInWave[i].numberOfLarge; j++)
+            {
+                Enemy spawnedEnemy = Instantiate(enemyWave.groupsOfEnemiesInWave[i].bigEnemy).GetComponent<Enemy>();
+                spawnedEnemy.route = enemyPath;
+                spawnedEnemy.purse = enemyCoins;
+                spawnedEnemy.lives = enemyLives;
+                yield return new WaitForSeconds(enemyWave.groupsOfEnemiesInWave[i].coolDownBetweenLargeEnemies);
+
+            }
+
+            yield return new WaitForSeconds(enemyWave.coolDownBetweenLargeWave); // cooldown between groups
+        }
+    }
 }
 
 
@@ -58,7 +73,7 @@ public class HordeManager : MonoBehaviour
 public struct Group
 {
   public GameObject smallEnemy;
-  public GameObject bigyEnemy;
+  public GameObject bigEnemy;
   public int numberOfSmall;
   public int numberOfLarge;
   public float coolDownBetweenSmallEnemies;
